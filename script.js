@@ -90,8 +90,22 @@ var upperCasedCharacters = [
 
 // Function to prompt user for password options
 function getPasswordOptions() {
-
+  let answer;  
+  do {
+    answer = parseInt(prompt("How many characters would you like to have in your password?"));
+    
+    if (isNaN(answer)) {
+      alert("Please enter a valid number.");
+    } else if (answer < 8) {
+      alert("The number of characters must be more than 8.");
+    } else if (answer > 128) {
+      alert("The number of characters must be less than 128.");
+    } 
+  } while (isNaN(answer) || answer < 8 || answer > 128);
+  
+  return answer;
 }
+getPasswordOptions()
 
 // Function for getting a random element from an array
 function getRandom(arr) {
@@ -100,7 +114,7 @@ function getRandom(arr) {
 
 // Function to generate password with user input
 function generatePassword() {
-
+  return
 }
 
 // Get references to the #generate element
