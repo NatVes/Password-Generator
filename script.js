@@ -88,6 +88,7 @@ var upperCasedCharacters = [
   'Z'
 ];
 
+// Global variable for password customization
 var options = {
   passwordLength: 0,
   userChoice: [],
@@ -95,10 +96,9 @@ var options = {
 
 // Function to prompt user for password options
 function getPasswordOptions() {
-  
+  // Loop to find out the password length
   do {
-    options.passwordLength = parseInt(prompt("How many characters would you like to have in your password?"));
-    
+    options.passwordLength = parseInt(prompt("How many characters would you like to have in your password?"));    
     if (isNaN(options.passwordLength)) {
       alert("Please enter a valid number.");
     } else if (options.passwordLength < 8) {
@@ -108,72 +108,65 @@ function getPasswordOptions() {
     } 
   } while (isNaN(options.passwordLength) || options.passwordLength < 8 || options.passwordLength > 128);
   
+  // Setting array of chosen options to the default 
   options.userChoice = [];
-  let specChar = false;
-  let request = confirm("Do you want to have special characters in your password?");
-  if (request) {
-    specChar = true;
-    options.userChoice.push(specialCharacters);
-  }   
   
-  let numChar = false;
-  request = confirm("Do you want to have numeric characters in your password?")
-  if (request) {
-    numChar = true;
-    options.userChoice.push(numericCharacters);
-  }   
+  // Function to ask the user and add character type to userChoice
+  function askAndAdd(characters, question) {
+    if (confirm(question)) {
+      options.userChoice.push(characters);
+      return true;
+    }
+    return false;
+  }
 
-  let lowCase = false;
-  request = confirm("Do you want to have lowercase characters in your password?")
-  if (request) {
-    lowCase = true;
-    options.userChoice.push(lowerCasedCharacters);
-  }  
+  // Ask for each character type  
+  var specChar = askAndAdd(specialCharacters, "Do you want to have special characters in your password?");
+  var numChar = askAndAdd(numericCharacters, "Do you want to have numeric characters in your password?");
+  var lowCase = askAndAdd(lowerCasedCharacters, "Do you want to have lowercase characters in your password?");
+  var upCase = askAndAdd(upperCasedCharacters, "Do you want to have uppercase characters in your password?");  
 
-  let upCase = false;
-  request = confirm("Do you want to have uppercase characters in your password?")
-  if (request) {
-    upCase = true;
-    options.userChoice.push(upperCasedCharacters);
-  } 
-
+  // Check if at least one option is selected
   if (!specChar && !numChar && !lowCase && !upCase) {
-    alert("Password can not be generated! Choose at least one option.")
-  }    
+    alert("Password can not be generated! Choose at least one option.");
+    getPasswordOptions();
+  }  
 }
-
 
 // Function for getting a random element from an array
 function getRandom(arr) {
-  let random = arr[Math.floor(Math.random()*arr.length)];
+  var random = arr[Math.floor(Math.random()*arr.length)];
   return random;
 }
 
 // Function to generate password with user input
 function generatePassword() {
+  // Generating password text
   var text = "";
-
+  // Make sure that at least one character of each selected type is used
   for (i=0; i<options.userChoice.length; i++) {
     text += getRandom(options.userChoice[i])
   }
-
+  // Generating the remaining characters according to the length of the password
   for (i=0; i<options.passwordLength-options.userChoice.length; i++) {
     randomArr = getRandom(options.userChoice);
     randomChar = getRandom(randomArr);
     text += randomChar
   }
 
+// Fisher-Yates algorithm to shuffle the characters of the password
+  // Convert the string into an array of characters and get the length of the array
   var shuffledText = text.split(""),
   shufTextLength = shuffledText.length;
-
+    
     for(var i = shufTextLength - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var tmp = shuffledText[i];
-        shuffledText[i] = shuffledText[j];
-        shuffledText[j] = tmp;
+        var j = Math.floor(Math.random() * (i + 1)); // Generate a random index between 0 and i (inclusive)
+        var tmp = shuffledText[i]; // Temporary variable to hold the value at index i
+        shuffledText[i] = shuffledText[j]; // Swap the values at indices i and j
+        shuffledText[j] = tmp; // Put the original value of shuffledText[i] into index j
     }
 
-    return shuffledText.join("");    
+    return shuffledText.join(""); // Convert the array back to a string and return the shuffled string
 }
 
 // Get references to the #generate element
