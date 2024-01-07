@@ -88,66 +88,58 @@ var upperCasedCharacters = [
   'Z'
 ];
 
+var options = {
+  passwordLength: 0,
+  userChoice: [],
+}
+
 // Function to prompt user for password options
 function getPasswordOptions() {
-  let passwordLength;  
+  
   do {
-    passwordLength = parseInt(prompt("How many characters would you like to have in your password?"));
+    options.passwordLength = parseInt(prompt("How many characters would you like to have in your password?"));
     
-    if (isNaN(passwordLength)) {
+    if (isNaN(options.passwordLength)) {
       alert("Please enter a valid number.");
-    } else if (passwordLength < 8) {
+    } else if (options.passwordLength < 8) {
       alert("The number of characters must be more than 8.");
-    } else if (passwordLength > 128) {
+    } else if (options.passwordLength > 128) {
       alert("The number of characters must be less than 128.");
     } 
-  } while (isNaN(passwordLength) || passwordLength < 8 || passwordLength > 128);
+  } while (isNaN(options.passwordLength) || options.passwordLength < 8 || options.passwordLength > 128);
   
-  console.log(passwordLength)
-
-  let userChoice = [];
-
+  options.userChoice = [];
   let specChar = false;
   let request = confirm("Do you want to have special characters in your password?");
   if (request) {
     specChar = true;
-    userChoice.push(specialCharacters);
-  } 
-
-  console.log(specChar)
-  console.log(userChoice)
-
+    options.userChoice.push(specialCharacters);
+  }   
+  
   let numChar = false;
   request = confirm("Do you want to have numeric characters in your password?")
   if (request) {
     numChar = true;
-    userChoice.push(numericCharacters);
-  } 
-
-  console.log(numChar)
+    options.userChoice.push(numericCharacters);
+  }   
 
   let lowCase = false;
   request = confirm("Do you want to have lowercase characters in your password?")
   if (request) {
     lowCase = true;
-    userChoice.push(lowerCasedCharacters);
-  }
-
-  console.log(lowCase)
+    options.userChoice.push(lowerCasedCharacters);
+  }  
 
   let upCase = false;
   request = confirm("Do you want to have uppercase characters in your password?")
   if (request) {
     upCase = true;
-    userChoice.push(upperCasedCharacters);
-  }
-
-  console.log(upCase)
+    options.userChoice.push(upperCasedCharacters);
+  } 
 
   if (!specChar && !numChar && !lowCase && !upCase) {
     alert("Password can not be generated! Choose at least one option.")
-  }
-  return userChoice;
+  }    
 }
 
 
@@ -159,15 +151,29 @@ function getRandom(arr) {
 
 // Function to generate password with user input
 function generatePassword() {
-  text = "";
-  for (i=0; i<passwordLength; i++) {
-    randomArr = getRandom(userChoice);
+  var text = "";
+
+  for (i=0; i<options.userChoice.length; i++) {
+    text += getRandom(options.userChoice[i])
+  }
+
+  for (i=0; i<options.passwordLength-options.userChoice.length; i++) {
+    randomArr = getRandom(options.userChoice);
     randomChar = getRandom(randomArr);
     text += randomChar
-
   }
-  console.log(text)
-  return text
+
+  var shuffledText = text.split(""),
+  shufTextLength = shuffledText.length;
+
+    for(var i = shufTextLength - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = shuffledText[i];
+        shuffledText[i] = shuffledText[j];
+        shuffledText[j] = tmp;
+    }
+
+    return shuffledText.join("");    
 }
 
 // Get references to the #generate element
@@ -175,6 +181,7 @@ var generateBtn = document.querySelector('#generate');
 
 // Write password to the #password input
 function writePassword() {
+  getPasswordOptions();
   var password = generatePassword();
   var passwordText = document.querySelector('#password');
 
@@ -184,10 +191,3 @@ function writePassword() {
 // Add event listener to generate button
 generateBtn.addEventListener('click', writePassword);
 
-var start = confirm('Would you like to generate new password?');
-
-if (start) {
-  getPasswordOptions();
-} else {
-    alert('Try again!');
-}
